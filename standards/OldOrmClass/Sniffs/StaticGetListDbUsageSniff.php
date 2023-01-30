@@ -5,7 +5,7 @@ namespace PHP_CodeSniffer\standards\OldOrmClass\Sniffs;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
-class DynamicDeleteDbUsageSniff implements Sniff
+class StaticGetListDbUsageSniff implements Sniff
 {
 
     public function register()
@@ -20,16 +20,16 @@ class DynamicDeleteDbUsageSniff implements Sniff
 
         $funcName = $tokens[$stackPtr + 2];
 
-        if (strtolower($funcName['content']) !== 'delete') {
+        if (strtolower($funcName['content']) !== 'getlist') {
             return;
         }
 
         // Проверка на статику
         if (
-            $tokens[$stackPtr - 2]['code'] === T_STATIC
-            || $tokens[$stackPtr - 4]['code'] === T_STATIC
+            $tokens[$stackPtr - 2]['code'] !== T_STATIC
+            && $tokens[$stackPtr - 4]['code'] !== T_STATIC
         ) {
-            $phpcsFile->addError('Method Delete should be dynamic', $stackPtr, 'DynamicDeleteDbUsageSniff');
+            $phpcsFile->addError('Method GetList should be static', $stackPtr, 'StaticGetListDbUsageSniff');
         }
 
         // Проверка на использование глобальной переменной $DB
@@ -47,7 +47,7 @@ class DynamicDeleteDbUsageSniff implements Sniff
         }
 
         if ($globalDb === false) {
-            $phpcsFile->addError('Method Delete should use global variable $DB', $stackPtr, 'DynamicDeleteDbUsageSniff');
+            $phpcsFile->addError('Method GetList should use global variable $DB', $stackPtr, 'StaticGetListDbUsageSniff');
         }
 
         // Проверка на использование $DB->Query()
@@ -65,7 +65,7 @@ class DynamicDeleteDbUsageSniff implements Sniff
         }
 
         if ($query === false) {
-            $phpcsFile->addError('Method Delete should use $DB->Query()', $stackPtr, 'DynamicDeleteDbUsageSniff');
+            $phpcsFile->addError('Method GetList should use $DB->Query()', $stackPtr, 'StaticGetListDbUsageSniff');
         }
     }
 }
