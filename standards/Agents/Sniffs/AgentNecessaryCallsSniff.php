@@ -51,7 +51,6 @@ class AgentNecessaryCallsSniff implements Sniff {
                 ($tokenBefore['content'] === 'CEvent' && $tokenAfter['content'] === 'Send')
             ) {
                 $nextToken = $tokens[$posDoubleColon + 2];
-                print_r($nextToken);
 
                 if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
                     $correct = true;
