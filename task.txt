@@ -2,6 +2,7 @@
 
 
 В отдельном стандарте "Agents": любая функция (или метод), объявленная в файле, должна заканчиваться конструкцией return __FUNCTION__ . "(...);";
+// Каждый return должен быть таким
 
 
 В отдельном стандарте "Agents": любая функция, объявленная в файле, должна содержать вызовы методов: CModule::IncludeModule, CIBlockElement::GetList, CEventLog::Add, CUser::GetList, CEvent::Send
