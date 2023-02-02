@@ -18,18 +18,21 @@ class AgentNecessaryCallsSniff implements Sniff {
         return [T_FUNCTION];
     }
 
-//    private bool $launches = false;
-
     public function process(File $phpcsFile, $stackPtr) {
-//        $this->launches++;
-//        if ($this->launches >= 2) return;
-
         $tokens = $phpcsFile->getTokens();
 
         $function = $tokens[$stackPtr];
 
         $from = $stackPtr;
         $correct = false;
+
+        $calls = [
+            'cmodule' => false,
+            'ciblockelement' => false,
+            'ceventlog' => false,
+            'cuser' => false,
+            'cevent' => false,
+        ];
 
         while (true) {
             $posDoubleColon = $phpcsFile->findNext(T_DOUBLE_COLON, $from, $function['scope_closer']);
@@ -39,27 +42,51 @@ class AgentNecessaryCallsSniff implements Sniff {
             $tokenBefore = $tokens[$posDoubleColon - 1];
             $tokenAfter = $tokens[$posDoubleColon + 1];
 
-//            print_r($tokenBefore);
-//            print_r(PHP_EOL);
-//            print_r($tokenAfter);
 
-            if (
-                ($tokenBefore['content'] === 'CModule' && $tokenAfter['content'] === 'IncludeModule') ||
-                ($tokenBefore['content'] === 'CIBlockElement' && $tokenAfter['content'] === 'GetList') ||
-                ($tokenBefore['content'] === 'CEventLog' && $tokenAfter['content'] === 'Add') ||
-                ($tokenBefore['content'] === 'CUser' && $tokenAfter['content'] === 'GetList') ||
-                ($tokenBefore['content'] === 'CEvent' && $tokenAfter['content'] === 'Send')
-            ) {
+
+            if ($tokenBefore['content'] === 'CModule' && $tokenAfter['content'] === 'IncludeModule') {
                 $nextToken = $tokens[$posDoubleColon + 2];
 
                 if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
-                    $correct = true;
-                    return;
+                    $calls['cmodule'] = true;
+                }
+            }
+
+            if ($tokenBefore['content'] === 'CIBlockElement' && $tokenAfter['content'] === 'GetList') {
+                $nextToken = $tokens[$posDoubleColon + 2];
+
+                if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
+                    $calls['ciblockelement'] = true;
+                }
+            }
+
+            if ($tokenBefore['content'] === 'CEventLog' && $tokenAfter['content'] === 'Add') {
+                $nextToken = $tokens[$posDoubleColon + 2];
+
+                if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
+                    $calls['ceventlog'] = true;
+                }
+            }
+
+            if ($tokenBefore['content'] === 'CUser' && $tokenAfter['content'] === 'GetList') {
+                $nextToken = $tokens[$posDoubleColon + 2];
+
+                if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
+                    $calls['cuser'] = true;
+                }
+            }
+
+            if ($tokenBefore['content'] === 'CEvent' && $tokenAfter['content'] === 'Send') {
+                $nextToken = $tokens[$posDoubleColon + 2];
+
+                if ($nextToken['type'] === 'T_OPEN_PARENTHESIS') {
+                    $calls['cevent'] = true;
                 }
             }
         }
 
-        if ($correct === false) {
+
+        if (in_array(false, $calls)) {
             $phpcsFile->addError('Every function must contain CModule::IncludeModule, CIBlockElement::GetList, CEventLog::Add, CUser::GetList, CEvent::Send', $stackPtr, 'AgentNecessaryCallsSniff');
         }
     }

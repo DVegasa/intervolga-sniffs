@@ -4,6 +4,11 @@
 
 function a() {
     CModule::IncludeModule();
+    CModule::IncludeModule();
+    CIBlockElement::GetList();
+    CEventLog::Add();
+    CUser::GetList();
+    CEvent::Send();
     return __FUNCTION__ . '();';
 }
 
