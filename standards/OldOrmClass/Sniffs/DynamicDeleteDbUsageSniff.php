@@ -58,7 +58,7 @@ class DynamicDeleteDbUsageSniff implements Sniff
             if ($posArrow === false) break;
             $from = $posArrow + 1;
 
-            if ($tokens[$posArrow + 1]['content'] === 'Query') {
+            if (strtolower($tokens[$posArrow + 1]['content']) === 'query') {
                 $query = true;
                 break;
             }

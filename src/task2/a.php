@@ -2,7 +2,6 @@
 
 function a() {
     $a = 2+2;
-    return;
     return __FUNCTION__ . '();';
 }
 
